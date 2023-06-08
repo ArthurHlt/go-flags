@@ -660,6 +660,7 @@ func (p *parseState) addArgs(args ...string) error {
 				p.err = err
 				return err
 			}
+			p.positional = p.positional[1:]
 			p.retargs = make([]string, 0)
 			return nil
 		}
