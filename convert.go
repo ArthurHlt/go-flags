@@ -189,6 +189,16 @@ func convertUnmarshal(val string, retval reflect.Value) (bool, error) {
 	return false, nil
 }
 
+func isUnmarshaler(val reflect.Value) bool {
+	if val.Type().NumMethod() > 0 && val.CanInterface() {
+		if _, ok := val.Interface().(Unmarshaler); ok {
+			return true
+		}
+	}
+
+	return false
+}
+
 func convert(val string, retval reflect.Value, options multiTag) error {
 	if ok, err := convertUnmarshal(val, retval); ok {
 		return err

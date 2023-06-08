@@ -238,19 +238,13 @@ func (g *Group) scanStruct(realval reflect.Value, sfield *reflect.StructField, h
 				return err
 			}
 		} else if kind == reflect.Ptr && field.Type.Elem().Kind() == reflect.Struct {
-			flagCountBefore := len(g.options) + len(g.groups)
-
 			if fld.IsNil() {
 				fld = reflect.New(fld.Type().Elem())
 			}
-
 			if err := g.scanStruct(reflect.Indirect(fld), &field, handler); err != nil {
 				return err
 			}
-
-			if len(g.options)+len(g.groups) != flagCountBefore {
-				realval.Field(i).Set(fld)
-			}
+			realval.Field(i).Set(fld)
 		}
 
 		longname := mtag.Get("long")

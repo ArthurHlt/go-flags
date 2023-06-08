@@ -164,6 +164,32 @@ func (c *Command) scanSubcommandHandler(parentg *Group) scanHandler {
 
 		if len(positional) != 0 {
 			stype := realval.Type()
+			if isUnmarshaler(realval.Addr()) {
+				name := mtag.Get("positional-arg-name")
+				if len(name) == 0 {
+					name = stype.Name()
+				}
+				required := -1
+				requiredMaximum := -1
+				sreq := mtag.Get("required")
+				if sreq != "" {
+					required = 1
+				}
+				arg := &Arg{
+					Name:            name,
+					Description:     mtag.Get("description"),
+					Required:        required,
+					RequiredMaximum: requiredMaximum,
+
+					value: realval.Addr(),
+					tag:   mtag,
+				}
+				c.args = append(c.args, arg)
+				if sreq != "" {
+					c.ArgsRequired = true
+				}
+				return true, nil
+			}
 
 			for i := 0; i < stype.NumField(); i++ {
 				field := stype.Field(i)
@@ -204,7 +230,6 @@ func (c *Command) scanSubcommandHandler(parentg *Group) scanHandler {
 						}
 					}
 				}
-
 				arg := &Arg{
 					Name:            name,
 					Description:     m.Get("description"),

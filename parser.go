@@ -655,7 +655,14 @@ func (p *Parser) parseShort(s *parseState, optname string, argument *string) err
 func (p *parseState) addArgs(args ...string) error {
 	for len(p.positional) > 0 && len(args) > 0 {
 		arg := p.positional[0]
-
+		if isUnmarshaler(arg.value) {
+			if err := convert(strings.Join(args, " "), arg.value, arg.tag); err != nil {
+				p.err = err
+				return err
+			}
+			p.retargs = make([]string, 0)
+			return nil
+		}
 		if err := convert(args[0], arg.value, arg.tag); err != nil {
 			p.err = err
 			return err
